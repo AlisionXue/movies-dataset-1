@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 import logging
 import pickle
 import requests
+import gdown
+import os
 
 
 # 配置日志记录
@@ -26,9 +28,16 @@ st.set_page_config(page_title="Movie data display and recommend system", page_ic
 if 'init_flag' not in st.session_state:
     st.session_state.init_flag = True
     st.session_state.login_flag = False
+    
+    # 定义文件路径
+    file_path = "data/similarity.pkl"
+    # 如果文件不存在，则下载
+    if not os.path.exists(file_path):
+        url = "https://drive.google.com/file/d/1_UeAu9mJdJD0Hqt9YoFaxj7dgb-cupFy/view?usp=sharing"
+        gdown.download(url, file_path, quiet=False)
 
 
-if st.session_state.login_flag :   
+if st.session_state.login_flag : 
     st.title("🎬 Movie data diaplay and recommend system")
     st.write(
         """
