@@ -36,13 +36,12 @@ if 'init_flag' not in st.session_state:
     
     # 如果文件不存在，则下载
     if not os.path.exists(file_path):
-        st.info('123')
         url = f"https://drive.google.com/uc?id=1_UeAu9mJdJD0Hqt9YoFaxj7dgb-cupFy"
         url = 'https://file.upfile.live/uploads/20250201/4eb21edf06ade22cab071b2bd0d4d474.pkl'
         gdown.download(url, file_path, quiet=False)
-    a = open('data/similarity.pkl', 'rb')
-    a = a.read(100)
-    st.write(a)
+    # a = open('data/similarity.pkl', 'rb')
+    # a = a.read(100)
+    # st.write(a)
 
 if st.session_state.login_flag : 
     st.title("🎬 Movie data diaplay and recommend system")
