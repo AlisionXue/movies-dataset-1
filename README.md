@@ -1,4 +1,4 @@
-# 🎬 Movies dataset template
+# 🎬 Movie Trends & Recommender System
 
 A simple Streamlit app showing movie data from [The Movie Database (TMDB)](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata). 
 
