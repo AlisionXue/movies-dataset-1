@@ -273,13 +273,7 @@ df = load_movies_summary()
 movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
 movies_list = pd.DataFrame(movie_dict)
 
-#similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
-try:
-   similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
-   st.success("load pkl success")
-   st.write("数据类型:", type(similarity_data))
-except Exception as e:
-   st.error(f"error load: {e}")
+similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
 
 # -------------------------------------------------------------
 # 4. Helper Functions
