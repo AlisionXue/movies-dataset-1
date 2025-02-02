@@ -25,7 +25,7 @@
 # # 2. Streamlit Page Setup
 # # -------------------------------------------------------------
 # st.set_page_config(
-#     page_title="Movie Trends & Recommender",
+#     page_title="Movie Trends & Recommender System",
 #     page_icon="🎥"
 # )
 
@@ -99,7 +99,7 @@
 # # 5. Main Application Flow
 # # -------------------------------------------------------------
 # if st.session_state["user_session_active"]:
-#     st.title("🎥 Explore Movie Trends and Recommendations")
+#     st.title("🎥 Movie Trends & Recommender System")
 #     st.write(
 #         """
 #         Welcome! Use this application to analyze movie trends and discover 
