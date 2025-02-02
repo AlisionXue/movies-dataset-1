@@ -273,7 +273,13 @@ df = load_movies_summary()
 movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
 movies_list = pd.DataFrame(movie_dict)
 
-similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+#similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+try:
+   similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+   st.success("load pkl success")
+   st.write("数据类型:", type(similarity_data))
+except Exception as e:
+   st.error(f"error load: {e}")
 
 # -------------------------------------------------------------
 # 4. Helper Functions
@@ -444,7 +450,7 @@ else:
     with st.form("login_form"):
         username = st.text_input("username")
         password = st.text_input("password", type="password")
-        submitted = st.form_submit_button("login test")
+        submitted = st.form_submit_button("login")
 
         if submitted:
             if username == "admin" and password == "123":
