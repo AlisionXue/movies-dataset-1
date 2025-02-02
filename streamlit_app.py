@@ -444,7 +444,7 @@ else:
     with st.form("login_form"):
         username = st.text_input("username")
         password = st.text_input("password", type="password")
-        submitted = st.form_submit_button("login")
+        submitted = st.form_submit_button("login test")
 
         if submitted:
             if username == "admin" and password == "123":
