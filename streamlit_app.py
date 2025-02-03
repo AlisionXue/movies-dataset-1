@@ -322,7 +322,7 @@ def get_movie_recommendations(chosen_movie):
 # 5. Main Application Flow
 # -------------------------------------------------------------
 if st.session_state["user_session_active"]:
-    st.title("🎥 Explore Movie Trends and Recommendations")
+    st.title("🎥 Movie Trends and Recommendations System")
     st.write(
         """
         Welcome! Use this application to analyze movie trends and discover 
