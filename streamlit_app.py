@@ -9,6 +9,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message=".*st\\.experimental_get_query_params will be removed after.*",
+    category=DeprecationWarning
+)
+
 # -------------------------------------------------------------
 # 1. Logging Configuration
 # -------------------------------------------------------------
@@ -30,14 +37,6 @@ st.set_page_config(
 # Initialize session state variable if not already set
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
-
-import warnings
-# Suppress deprecation warnings about st.experimental_get_query_params
-warnings.filterwarnings(
-    "ignore",
-    message=".*st.experimental_get_query_params.*",
-    category=UserWarning  # or a more specific warning class if available
-)
 
 # Always get the latest query parameters
 query_params = st.experimental_get_query_params()
