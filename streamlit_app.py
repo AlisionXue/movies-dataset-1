@@ -32,6 +32,19 @@ st.set_page_config(
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
+# 从 URL 获取参数
+query_params = st.query_params
+url_username = query_params.get("username", [None])[0]
+url_password = query_params.get("password", [None])[0]
+
+# 预设的用户名和密码
+USERNAME = "admin"
+PASSWORD = "123"
+
+# 如果 URL 中包含用户名和密码，尝试自动登录
+if url_username == USERNAME and url_password == PASSWORD:
+    st.session_state["user_session_active"] = True
+
 # -------------------------------------------------------------
 # 3. Data Loading and Preparation
 # -------------------------------------------------------------
@@ -97,16 +110,8 @@ def get_movie_recommendations(chosen_movie):
 # -------------------------------------------------------------
 # 5. Main Application Flow
 # -------------------------------------------------------------
-# Check for URL parameters
-query_params = st.query_params
-if 'username' in query_params and 'password' in query_params:
-    username = query_params['username']
-    password = query_params['password']
-    if username == "admin" and password == "123":
-        st.session_state["user_session_active"] = True
-
 if st.session_state["user_session_active"]:
-    st.title("🎥 Explore Movie Trends and Recommendations")
+    st.title("🎥 Movie Trends and Recommendations System")
     st.write(
         """
         Welcome! Use this application to analyze movie trends and discover 
@@ -208,6 +213,37 @@ if st.session_state["user_session_active"]:
     alt_data = pd.melt(
         pivot_table.reset_index(),
         id_vars="year",
-        var_name="
-::contentReference[oaicite:0]{index=0}
- 
+        var_name="genre",
+        value_name="gross"
+    )
+    alt_chart = (
+        alt.Chart(alt_data)
+        .mark_line()
+        .encode(
+            x="year:O",
+            y="gross:Q",
+            color="genre:N",
+            tooltip=["year", "genre", "gross"]
+        )
+        .properties(width=600, height=400)
+    )
+    st.altair_chart(alt_chart, use_container_width=True)
+
+    if st.button("Logout"):
+        st.session_state["user_session_active"] = False
+        st.experimental_rerun()
+
+else:
+    st.warning("Please login to access the application.")
+    with st.form("login_form"):
+        user_input = st.text_input("Username")
+        password_input = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Login")
+
+        if submitted:
+            if user_input == USERNAME and password_input == PASSWORD:
+                st.success("Login successful!")
+                st.session_state["user_session_active"] = True
+                st.experimental_rerun()
+            else:
+                st.error("Incorrect username or password.")
