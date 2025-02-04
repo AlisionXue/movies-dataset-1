@@ -1,9 +1,3 @@
-import os
-os.environ["PYTHONWARNINGS"] = "ignore::DeprecationWarning"
-
-import warnings
-warnings.simplefilter("ignore", DeprecationWarning)
-
 import altair as alt
 import pandas as pd
 import streamlit as st
