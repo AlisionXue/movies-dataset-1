@@ -32,7 +32,7 @@ if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
 # Retrieve URL parameters
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 url_username = query_params.get("username", [None])[0]
 url_password = query_params.get("password", [None])[0]
 
