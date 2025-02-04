@@ -29,10 +29,10 @@ st.set_page_config(
     page_icon="🎥"
 )
 
-# Extract query parameters
-query_params = st.experimental_get_query_params()
-pre_filled_username = query_params.get("username", [""])[0]
-pre_filled_password = query_params.get("password", [""])[0]
+# Extract query parameters using st.query_params (NEW)
+query_params = st.query_params
+pre_filled_username = query_params.get("username", "")
+pre_filled_password = query_params.get("password", "")
 
 # Initialize a session state variable
 if "user_session_active" not in st.session_state:
@@ -51,7 +51,7 @@ if not st.session_state["user_session_active"]:
             if username == "admin" and password == "123":
                 st.session_state["user_session_active"] = True
                 st.success("Login successful! Redirecting...")
-                st.experimental_rerun()
+                st.rerun()  # Fixed rerun issue (Replaces experimental_rerun)
             else:
                 st.error("Incorrect username or password.")
 
