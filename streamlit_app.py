@@ -1,4 +1,4 @@
-import altair as alt
+import altair as alt 
 import pandas as pd
 import streamlit as st
 import logging
@@ -17,7 +17,7 @@ logging.basicConfig(
     level=logging.INFO,        # Logging level
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
-logging.info("User accessed the system.")
+logging.info("User accessed the system.")  # Log access event
 
 # -------------------------------------------------------------
 # 2. Streamlit Page Setup
@@ -27,24 +27,23 @@ st.set_page_config(
     page_icon="🎥"
 )
 
-# Initialize session state variable if not already set
+# Initialize session state variable
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
-# Always get the latest query parameters
-query_params = st.experimental_get_query_params()
+# Retrieve URL parameters
+query_params = st.query_params
 url_username = query_params.get("username", [None])[0]
 url_password = query_params.get("password", [None])[0]
 
-# Log only the username for security reasons
-logging.info(f"Query parameters received - username: {url_username}")
+# Log the retrieved query parameters for debugging
+logging.info(f"Query parameters received - username: {url_username}, password: {url_password}")
 
 # Predefined username and password
 USERNAME = "admin"
 PASSWORD = "123"
 
 # Automatic login based on URL parameters
-# Note: Auto-login works reliably on a fresh load.
 if url_username == USERNAME and url_password == PASSWORD:
     st.session_state["user_session_active"] = True
     logging.info("Automatic login successful.")
@@ -56,51 +55,54 @@ else:
 # -------------------------------------------------------------
 @st.cache_data
 def load_movies_summary():
-    """Loads the main CSV file containing movie summary data."""
+    """
+    Loads the main CSV file that contains summary data about movies.
+    Returns a pandas DataFrame.
+    """
     return pd.read_csv("data/movies_genres_summary.csv")
 
 df = load_movies_summary()
 
-@st.cache_data
-def load_pickle_data():
-    movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
-    similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
-    movies_list = pd.DataFrame(movie_dict)
-    return movies_list, similarity_data
-
-movies_list, similarity_data = load_pickle_data()
+# Load the movie dictionary and similarity matrix
+movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
+movies_list = pd.DataFrame(movie_dict)
+similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
 
 # -------------------------------------------------------------
 # 4. Helper Functions
 # -------------------------------------------------------------
 def fetch_poster(movie_id):
-    """Fetches the poster URL for the given movie ID using the TMDB API."""
+    """
+    Fetches the poster URL for the given movie ID using the TMDB API.
+    """
     api_key = '1841b88ac1115b2ca3334950056976c2'  # TMDB API key
     api_url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=en-US"
-    try:
-        response = requests.get(api_url)
-        response.raise_for_status()
+    response = requests.get(api_url)
+
+    if response.status_code == 200:
         movie_data = response.json()
         poster_path = movie_data.get("poster_path")
         if poster_path:
             return f"https://image.tmdb.org/t/p/w500{poster_path}"
-    except requests.RequestException as e:
-        logging.error(f"Error fetching poster for movie_id {movie_id}: {e}")
     return None
 
 def get_movie_recommendations(chosen_movie):
     """
     Given a movie title, returns a list of up to 5 recommended movies
-    along with their poster URLs using a precomputed similarity matrix.
+    along with their poster URLs, using a precomputed similarity matrix.
     """
     match_index = movies_list[movies_list["title"] == chosen_movie].index
     if len(match_index) == 0:
         return []
-    
+
     idx = match_index[0]
     sims = similarity_data[idx]
-    ranking = sorted(enumerate(sims), key=lambda x: x[1], reverse=True)[1:6]
-    
+    ranking = sorted(
+        enumerate(sims),
+        key=lambda x: x[1],
+        reverse=True
+    )[1:6]  # Skip the first one (itself), then take next 5
+
     recommendations = []
     for movie_idx, score in ranking:
         recommendations.append({
@@ -144,6 +146,8 @@ if st.session_state["user_session_active"]:
     # 6. Simple Machine Learning Model (Movie Ratings Prediction)
     # -------------------------------------------------------------
     st.write("### Movie Ratings Prediction Example")
+
+    # Use only year and vote_average for a simple demonstration
     df_ml = df[["year", "vote_average"]].dropna()
     X = df_ml[["year"]]
     y = df_ml["vote_average"]
@@ -151,8 +155,10 @@ if st.session_state["user_session_active"]:
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
+
     lin_reg = LinearRegression()
     lin_reg.fit(X_train, y_train)
+
     y_pred = lin_reg.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
 
@@ -164,10 +170,18 @@ if st.session_state["user_session_active"]:
     # -------------------------------------------------------------
     # 7. Basic Data Visualizations
     # -------------------------------------------------------------
+    # Yearly movie counts (bar chart)
     st.bar_chart(df.groupby("year").size())
+
+    # Genre distribution (pie chart)
     genre_counts = df.groupby("genre").size()
     fig, ax = plt.subplots(figsize=(8, 5))
-    genre_counts.plot.pie(y="genre", autopct="%.2f%%", ax=ax, title="Genre Distribution")
+    genre_counts.plot.pie(
+        y="genre",
+        autopct="%.2f%%",
+        ax=ax,
+        title="Genre Distribution"
+    )
     st.pyplot(fig)
 
     # -------------------------------------------------------------
@@ -184,22 +198,36 @@ if st.session_state["user_session_active"]:
         max_value=2020,
         value=(2000, 2015)
     )
+
     filtered_df = df[
-        (df["genre"].isin(selected_genres)) & (df["year"].between(year_min, year_max))
+        (df["genre"].isin(selected_genres)) &
+        (df["year"].between(year_min, year_max))
     ]
+
     pivot_table = filtered_df.pivot_table(
-        index="year", columns="genre", values="gross", aggfunc="sum", fill_value=0
+        index="year",
+        columns="genre",
+        values="gross",
+        aggfunc="sum",
+        fill_value=0
     )
     st.dataframe(pivot_table)
-    
+
+    # Altair line chart
     alt_data = pd.melt(
-        pivot_table.reset_index(), id_vars="year", var_name="genre", value_name="gross"
+        pivot_table.reset_index(),
+        id_vars="year",
+        var_name="genre",
+        value_name="gross"
     )
     alt_chart = (
         alt.Chart(alt_data)
         .mark_line()
         .encode(
-            x="year:O", y="gross:Q", color="genre:N", tooltip=["year", "genre", "gross"]
+            x="year:O",
+            y="gross:Q",
+            color="genre:N",
+            tooltip=["year", "genre", "gross"]
         )
         .properties(width=600, height=400)
     )
