@@ -4,19 +4,30 @@ import streamlit as st
 USERNAME = "admin"
 PASSWORD = "123"
 
-# 检查登录状态
+# 检查用户的登录状态
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
-# 如果已登录
+# 从 URL 获取参数
+query_params = st.experimental_get_query_params()
+url_username = query_params.get("username", [None])[0]
+url_password = query_params.get("password", [None])[0]
+
+# 如果 URL 中包含用户名和密码，尝试自动登录
+if url_username == USERNAME and url_password == PASSWORD:
+    st.session_state["user_session_active"] = True
+
+# 如果用户已经登录
 if st.session_state["user_session_active"]:
     st.success(f"Welcome, {USERNAME}!")
     st.write("You have successfully accessed the secured application.")
+    
+    # 登出功能
     if st.button("Logout"):
         st.session_state["user_session_active"] = False
         st.experimental_rerun()
 
-# 如果未登录
+# 如果用户未登录
 else:
     st.warning("Please login to access the application.")
     with st.form("login_form"):
