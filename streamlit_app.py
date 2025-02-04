@@ -94,23 +94,16 @@ def get_movie_recommendations(chosen_movie):
         })
     return recommendations
 
-def authenticate_user(username, password):
-    """
-    Authenticates the user based on the provided username and password.
-    """
-    # Replace with your actual authentication logic
-    return username == "admin" and password == "123"
-
 # -------------------------------------------------------------
 # 5. Main Application Flow
 # -------------------------------------------------------------
 # Check for URL parameters
 query_params = st.query_params
-if "username" in query_params and "password" in query_params:
-    if authenticate_user(query_params["username"], query_params["password"]):
+if 'username' in query_params and 'password' in query_params:
+    username = query_params['username']
+    password = query_params['password']
+    if username == "admin" and password == "123":
         st.session_state["user_session_active"] = True
-    else:
-        st.error("Invalid username or password.")
 
 if st.session_state["user_session_active"]:
     st.title("🎥 Explore Movie Trends and Recommendations")
@@ -199,7 +192,22 @@ if st.session_state["user_session_active"]:
 
     filtered_df = df[
         (df["genre"].isin(selected_genres)) &
-        (df["year"].
-::contentReference[oaicite:1]{index=1}
- 
+        (df["year"].between(year_min, year_max))
+    ]
 
+    pivot_table = filtered_df.pivot_table(
+        index="year",
+        columns="genre",
+        values="gross",
+        aggfunc="sum",
+        fill_value=0
+    )
+    st.dataframe(pivot_table)
+
+    # Altair line chart
+    alt_data = pd.melt(
+        pivot_table.reset_index(),
+        id_vars="year",
+        var_name="
+::contentReference[oaicite:0]{index=0}
+ 
