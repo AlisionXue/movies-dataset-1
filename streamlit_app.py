@@ -1,9 +1,8 @@
+import os
+os.environ["PYTHONWARNINGS"] = "ignore::DeprecationWarning"
+
 import warnings
-warnings.filterwarnings(
-    "ignore",
-    message=".*st\\.experimental_get_query_params will be removed after.*",
-    category=DeprecationWarning
-)
+warnings.simplefilter("ignore", DeprecationWarning)
 
 import altair as alt
 import pandas as pd
@@ -15,6 +14,7 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+
 
 
 
