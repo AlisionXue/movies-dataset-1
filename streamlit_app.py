@@ -13,11 +13,11 @@ from sklearn.metrics import mean_squared_error
 # 1. Logging Configuration
 # -------------------------------------------------------------
 logging.basicConfig(
-    filename="app_log.txt",    # Log file name
-    level=logging.INFO,        # Logging level
+    filename="app_log.txt",    # 日志文件名称
+    level=logging.INFO,        # 日志级别
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
-logging.info("User accessed the system.")  # Log access event
+logging.info("User accessed the system.")  # 记录访问日志
 
 # -------------------------------------------------------------
 # 2. Streamlit Page Setup
@@ -27,20 +27,20 @@ st.set_page_config(
     page_icon="🎥"
 )
 
-# Initialize session state variable
+# 初始化会话状态变量
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
-# Retrieve URL parameters
+# 从 URL 获取参数
 query_params = st.query_params
 url_username = query_params.get("username", [None])[0]
 url_password = query_params.get("password", [None])[0]
 
-# Predefined username and password
+# 预设的用户名和密码
 USERNAME = "admin"
 PASSWORD = "123"
 
-# Automatic login based on URL parameters
+# 如果 URL 中包含用户名和密码，尝试自动登录
 if url_username == USERNAME and url_password == PASSWORD:
     st.session_state["user_session_active"] = True
 
@@ -50,14 +50,13 @@ if url_username == USERNAME and url_password == PASSWORD:
 @st.cache_data
 def load_movies_summary():
     """
-    Loads the main CSV file that contains summary data about movies.
-    Returns a pandas DataFrame.
+    加载包含电影概要数据的 CSV 文件，并返回一个 pandas DataFrame。
     """
     return pd.read_csv("data/movies_genres_summary.csv")
 
 df = load_movies_summary()
 
-# Load the movie dictionary and similarity matrix
+# 加载电影字典和相似度矩阵
 movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
 movies_list = pd.DataFrame(movie_dict)
 similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
@@ -67,9 +66,9 @@ similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
 # -------------------------------------------------------------
 def fetch_poster(movie_id):
     """
-    Fetches the poster URL for the given movie ID using the TMDB API.
+    使用 TMDB API 根据电影 ID 获取电影海报 URL。
     """
-    api_key = '1841b88ac1115b2ca3334950056976c2'  # TMDB API key
+    api_key = '1841b88ac1115b2ca3334950056976c2'  # 使用相同的 API key
     api_url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=en-US"
     response = requests.get(api_url)
 
@@ -82,8 +81,7 @@ def fetch_poster(movie_id):
 
 def get_movie_recommendations(chosen_movie):
     """
-    Given a movie title, returns a list of up to 5 recommended movies
-    along with their poster URLs, using a precomputed similarity matrix.
+    根据选定的电影标题，通过预先计算的相似度矩阵返回最多 5 个推荐电影及其海报 URL。
     """
     match_index = movies_list[movies_list["title"] == chosen_movie].index
     if len(match_index) == 0:
@@ -95,7 +93,7 @@ def get_movie_recommendations(chosen_movie):
         enumerate(sims),
         key=lambda x: x[1],
         reverse=True
-    )[1:6]  # Skip the first one (itself), then take next 5
+    )[1:6]  # 跳过自身，然后取接下来的 5 部电影
 
     recommendations = []
     for movie_idx, score in ranking:
@@ -117,7 +115,7 @@ if st.session_state["user_session_active"]:
         """
     )
 
-    # Movie selection widget
+    # 电影推荐部分
     chosen_movie_title = st.selectbox(
         "Select a movie for recommendations:",
         movies_list["title"]
@@ -141,7 +139,7 @@ if st.session_state["user_session_active"]:
     # -------------------------------------------------------------
     st.write("### Movie Ratings Prediction Example")
 
-    # Use only year and vote_average for a simple demonstration
+    # 这里只使用年份和平均评分进行简单演示
     df_ml = df[["year", "vote_average"]].dropna()
     X = df_ml[["year"]]
     y = df_ml["vote_average"]
@@ -164,10 +162,10 @@ if st.session_state["user_session_active"]:
     # -------------------------------------------------------------
     # 7. Basic Data Visualizations
     # -------------------------------------------------------------
-    # Yearly movie counts (bar chart)
+    # 按年份统计电影数量（条形图）
     st.bar_chart(df.groupby("year").size())
 
-    # Genre distribution (pie chart)
+    # 按类型统计分布（饼图）
     genre_counts = df.groupby("genre").size()
     fig, ax = plt.subplots(figsize=(8, 5))
     genre_counts.plot.pie(
@@ -207,7 +205,7 @@ if st.session_state["user_session_active"]:
     )
     st.dataframe(pivot_table)
 
-    # Altair line chart
+    # Altair 折线图展示趋势
     alt_data = pd.melt(
         pivot_table.reset_index(),
         id_vars="year",
@@ -227,6 +225,7 @@ if st.session_state["user_session_active"]:
     )
     st.altair_chart(alt_chart, use_container_width=True)
 
+    # 添加退出登录按钮
     if st.button("Logout"):
         st.session_state["user_session_active"] = False
         st.experimental_rerun()
