@@ -1,4 +1,4 @@
-import altair as alt 
+import altair as alt
 import pandas as pd
 import streamlit as st
 import logging
@@ -36,8 +36,8 @@ query_params = st.query_params
 url_username = query_params.get("username", [None])[0]
 url_password = query_params.get("password", [None])[0]
 
-# Log the retrieved query parameters for debugging
-logging.info(f"Query parameters received - username: {url_username}, password: {url_password}")
+# 仅记录用户名，避免在日志中记录密码
+logging.info(f"Query parameters received - username: {url_username}")
 
 # Predefined username and password
 USERNAME = "admin"
@@ -63,10 +63,14 @@ def load_movies_summary():
 
 df = load_movies_summary()
 
-# Load the movie dictionary and similarity matrix
-movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
-movies_list = pd.DataFrame(movie_dict)
-similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+@st.cache_data
+def load_pickle_data():
+    movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
+    similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+    movies_list = pd.DataFrame(movie_dict)
+    return movies_list, similarity_data
+
+movies_list, similarity_data = load_pickle_data()
 
 # -------------------------------------------------------------
 # 4. Helper Functions
@@ -77,13 +81,15 @@ def fetch_poster(movie_id):
     """
     api_key = '1841b88ac1115b2ca3334950056976c2'  # TMDB API key
     api_url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=en-US"
-    response = requests.get(api_url)
-
-    if response.status_code == 200:
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()
         movie_data = response.json()
         poster_path = movie_data.get("poster_path")
         if poster_path:
             return f"https://image.tmdb.org/t/p/w500{poster_path}"
+    except requests.RequestException as e:
+        logging.error(f"Error fetching poster for movie_id {movie_id}: {e}")
     return None
 
 def get_movie_recommendations(chosen_movie):
