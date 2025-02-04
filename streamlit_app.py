@@ -26,7 +26,7 @@
 # # -------------------------------------------------------------
 # st.set_page_config(
 #     page_title="Movie Trends & Recommender System",
-#     page_icon="馃帴"
+#     page_icon="🎥"
 # )
 
 # # Initialize a session state variable
@@ -99,7 +99,7 @@
 # # 5. Main Application Flow
 # # -------------------------------------------------------------
 # if st.session_state["user_session_active"]:
-#     st.title("馃帴 Movie Trends & Recommender System")
+#     st.title("🎥 Movie Trends & Recommender System")
 #     st.write(
 #         """
 #         Welcome! Use this application to analyze movie trends and discover 
@@ -249,7 +249,7 @@ logging.info("User accessed the system.")  # Log an access event
 # -------------------------------------------------------------
 st.set_page_config(
     page_title="Movie Trends & Recommender",
-    page_icon="馃帴"
+    page_icon="🎥"
 )
 
 # Initialize a session state variable
@@ -322,7 +322,7 @@ def get_movie_recommendations(chosen_movie):
 # 5. Main Application Flow
 # -------------------------------------------------------------
 if st.session_state["user_session_active"]:
-    st.title("馃帴 Explore Movie Trends and Recommendations")
+    st.title("🎥 Explore Movie Trends and Recommendations")
     st.write(
         """
         Welcome! Use this application to analyze movie trends and discover 
