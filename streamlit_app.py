@@ -31,6 +31,14 @@ st.set_page_config(
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
+import warnings
+# Suppress deprecation warnings about st.experimental_get_query_params
+warnings.filterwarnings(
+    "ignore",
+    message=".*st.experimental_get_query_params.*",
+    category=UserWarning  # or a more specific warning class if available
+)
+
 # Always get the latest query parameters
 query_params = st.experimental_get_query_params()
 url_username = query_params.get("username", [None])[0]
