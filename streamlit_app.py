@@ -29,17 +29,26 @@ st.set_page_config(
     page_icon="🎥"
 )
 
-# Extract query parameters using st.query_params (NEW)
-query_params = st.query_params
-pre_filled_username = query_params.get("username", "")
-pre_filled_password = query_params.get("password", "")
+# Extract query parameters correctly
+pre_filled_username = st.query_params.get("username", [""])[0]
+pre_filled_password = st.query_params.get("password", [""])[0]
 
 # Initialize a session state variable
 if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
 # -------------------------------------------------------------
-# 3. Login Handling
+# 3. Data Loading (Ensure movies_list is loaded before use)
+# -------------------------------------------------------------
+@st.cache_data
+def load_movie_data():
+    movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
+    return pd.DataFrame(movie_dict)
+
+movies_list = load_movie_data()  # Load movie data
+
+# -------------------------------------------------------------
+# 4. Login Handling
 # -------------------------------------------------------------
 if not st.session_state["user_session_active"]:
     with st.form("login_form"):
@@ -51,12 +60,12 @@ if not st.session_state["user_session_active"]:
             if username == "admin" and password == "123":
                 st.session_state["user_session_active"] = True
                 st.success("Login successful! Redirecting...")
-                st.rerun()  # Fixed rerun issue (Replaces experimental_rerun)
+                st.rerun()  # Corrected rerun function
             else:
                 st.error("Incorrect username or password.")
 
 # -------------------------------------------------------------
-# 4. Main Application Flow (Only if logged in)
+# 5. Main Application Flow (Only if logged in)
 # -------------------------------------------------------------
 if st.session_state["user_session_active"]:
     st.title("🎥 Movie Trends & Recommender System")
@@ -70,10 +79,10 @@ if st.session_state["user_session_active"]:
     # Movie selection widget
     chosen_movie_title = st.selectbox(
         "Select a movie for recommendations:",
-        movies_list["title"]
+        movies_list["title"] if not movies_list.empty else ["No movies available"]
     )
 
-    if st.button("Get Recommendations"):
+    if st.button("Get Recommendations") and not movies_list.empty:
         movie_suggestions = get_movie_recommendations(chosen_movie_title)
         if movie_suggestions:
             st.subheader("Recommended Movies:")
