@@ -108,6 +108,6 @@ else:
         if submitted:
             if username == "admin" and password == "123":
                 st.session_state["user_session_active"] = True
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Invalid login credentials.")
