@@ -36,9 +36,9 @@ if "user_session_active" not in st.session_state:
     st.session_state["user_session_active"] = False
 
     file_path = 'data/similarity.pkl'
-    if not os.path.exists(file_path):
-        url = 'https://file.upfile.live/uploads/20250204/e1a958b718369923d4644e522503c319.pkl'
-        gdown.download(url,file_path,quiet=False)
+    # if not os.path.exists(file_path):
+        # url = 'https://file.upfile.live/uploads/20250204/e1a958b718369923d4644e522503c319.pkl'
+        # gdown.download(url,file_path,quiet=False)
         
 # -------------------------------------------------------------
 # 3. Data Loading and Preparation
@@ -57,7 +57,8 @@ df = load_movies_summary()
 movie_dict = pickle.load(open("data/movies_dict.pkl", "rb"))
 movies_list = pd.DataFrame(movie_dict)
 
-similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+# similarity_data = pickle.load(open("data/similarity.pkl", "rb"))
+similarity_data = pickle.load(open("data/sss.pkl", "rb"))
 
 # -------------------------------------------------------------
 # 4. Helper Functions
